@@ -15,7 +15,6 @@ This is the React.js frontend for the LSU Lost and Found application. It allows 
 - React.js
 - React Router (`react-router-dom`)
 - CSS (custom per page)
-- Supabase / fetch API (placeholder for backend integration)
 - useState for managing component state
 
 ## Setup Instructions
