@@ -29,9 +29,9 @@ This is the React.js frontend for the LSU Lost and Found application. It allows 
    cd frontend
    cd lost-and-found
 
-3. Install any dependencies
+3. Install any dependencies:
    npm install
 
-4. Start the development server
+4. Start the development server:
    In the directory lost-and-found run:
    - npm start
