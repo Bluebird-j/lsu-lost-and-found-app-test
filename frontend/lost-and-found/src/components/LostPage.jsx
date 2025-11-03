@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import lsuLostLogo from '../images/lsulogo.png';
 import lsuLostCampus from '../images/lsucampus.jpg';
 import '../styles/lostpage.css';
+import supabase from '../supabase-setup/supabase-client.js'
 const LostPage = () => {
+  const navigate = useNavigate();
   const [errorColor, setErrorColor] = useState('#000');
   const [errorColorBackground, setErrorColorBackground] = useState(null);
   const [backgroundInfo, setBackgroundInfo] = useState({
@@ -24,7 +26,7 @@ const LostPage = () => {
       [name]: value
     }))
   }
-  const handleLostInfo = (e) => {
+  const handleLostInfo = async (e) => {
     e.preventDefault();
     const phoneDigitTest = /^[0-9]{10}$/;
     const dateDigitTest = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{2}$/;
@@ -75,26 +77,29 @@ const LostPage = () => {
       setErrorColorBackground('#FEE2E2');
     }
 
-    if (!emptyInputs && backgroundInfo.email.includes('@') && dateDigitTest.test(backgroundInfo.itemlastseen) && phoneDigitTest.test(backgroundInfo.phonenumber)) {
-      alert('Your form was submitted successfully');
 
-
-      fetch('/submit-lost-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(backgroundInfo)
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('NOTE: the form has been sent to the database.');
-        })
-        .catch(error => {
-          console.log('NOTE: there was an error breaching the form to the database.', error);
-        })
+    const {data, error} = await supabase.from('lost').insert([
+      {
+        firstname: backgroundInfo.firstname,
+        lastname: backgroundInfo.lastname,
+        email: backgroundInfo.email,
+        itemtype: backgroundInfo.itemtype,
+        itemname: backgroundInfo.itemname,
+        itemlastseen: backgroundInfo.itemlastseen,
+        phonenumber: backgroundInfo.phonenumber,
+        details: backgroundInfo.details,
       }
+    ])
+
+    if (error) {
+      alert('This data: ' + error.message + 'is invalid')
+      console.error(error)
+      return;
     }
+
+    alert('Your form was submitted successfully!');
+    navigate('/')
+  }
 
 
 

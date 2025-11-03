@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import '../styles/mainpage.css';
 import lsuLibrary from '../images/lsulib.jpg';
 import lsuLogo from '../images/lsulogo.png';

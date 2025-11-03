@@ -1,11 +1,13 @@
 import React, {useState} from 'react'
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import lsuLoginLogo from '../images/lsulogo.png';
 import lsuCampus from '../images/lsucampus.jpg'
 import githubLogo from '../images/githublogo.png'
 import keyLogo from '../images/key.png'
+import supabase from '../supabase-setup/supabase-client.js'
 import '../styles/login.css'
 const LoginPage = () => {
+  const navigate = useNavigate()
 const[email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 const [emailColor, setEmailColor] = useState("#000");
@@ -16,7 +18,7 @@ const [passwordColor, setPasswordColor] = useState("#000");
 const handleEmailChange = (e) => setEmail(e.target.value);
 const handlePasswordChange = (e) => setPassword(e.target.value);
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
 e.preventDefault();
  if (email.trim() === "") {
   alert('There is no email on set. Please enter an email.');
@@ -37,6 +39,20 @@ e.preventDefault();
   setPasswordColor('#000');
   setPasswordBackgroundColor(null);
  }
+
+ const {data, error} = await supabase.auth.signInWithPassword({
+  email: email,
+  password: password,
+ })
+
+ if (error) {
+  alert('Login unsuccessful. Please try again.')
+  setEmail("")
+  setPassword("")
+ }
+
+ alert("User login successful!")
+ navigate('/');
 }
   return (
     <div>

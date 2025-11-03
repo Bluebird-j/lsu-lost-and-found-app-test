@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import lsuFoundLogo from '../images/lsulogo.png';
 import lsuFoundCampus from '../images/lsucampus.jpg';
 import '../styles/foundpage.css';
+import supabase from '../supabase-setup/supabase-client.js'
 const FoundPage = () => {
+  const navigate = useNavigate();
      const [errorColor, setErrorColor] = useState('#000');
      const [errorColorBackground, setErrorColorBackground] = useState(null);
      const [backgroundInfo, setBackgroundInfo] = useState({
@@ -24,7 +26,7 @@ const FoundPage = () => {
          [name]: value
        }))
      }
-     const handleFoundInfo = (e) => {
+     const handleFoundInfo = async (e) => {
        e.preventDefault();
        const phoneDigitTest = /^[0-9]{10}$/;
        const dateDigitTest = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{2}$/;
@@ -51,6 +53,7 @@ const FoundPage = () => {
          alert('This is not a valid date. Try MM/DD/YY');
          setErrorColor('#DC2626');
          setErrorColorBackground('#FEE2E2');
+         return;
        }
      
    
@@ -63,25 +66,27 @@ const FoundPage = () => {
        }
 
 
-    if (!emptyInputs && backgroundInfo.email.includes('@') && dateDigitTest.test(backgroundInfo.itemfound) && phoneDigitTest.test(backgroundInfo.phonenumber)) {
-      alert('Your form was submitted successfully');
-
-
-      fetch('/submit-found-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(backgroundInfo)
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('NOTE: the form has been sent to the database.');
-        })
-        .catch(error => {
-          console.log('NOTE: there was an error breaching the form to the database.', error);
-        })
+      const {data, error} = await supabase.from('found').insert([
+        {
+      firstname: backgroundInfo.firstname,
+      lastname: backgroundInfo.lastname,
+      email: backgroundInfo.email,
+      itemtype: backgroundInfo.itemtype,
+      itemname: backgroundInfo.itemname,
+      itemfound: backgroundInfo.itemfound,
+      phonenumber: backgroundInfo.phonenumber,
+      details: backgroundInfo.details,
       }
+    ])
+
+      if (error) {
+        alert('This data: ' + error.message + ' is invalid');
+        console.error(error);
+        return;
+      }
+
+      alert('Your form was submitted successfully!');
+      navigate('/')
     }
   return (
     <div>

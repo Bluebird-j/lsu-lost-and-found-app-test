@@ -1,11 +1,13 @@
 import React, {useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import lsuLoginLogo from '../images/lsulogo.png';
 import lsuCampus from '../images/lsucampus.jpg'
 import githubLogo from '../images/githublogo.png'
 import keyLogo from '../images/key.png'
 import '../styles/signup.css'
+import supabase from '../supabase-setup/supabase-client.js'
 const SignUp = () => {
+const navigate = useNavigate();
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 const [emailColor, setEmailColor] = useState('#000');
@@ -16,7 +18,7 @@ const [passwordBackground, setPasswordBackground] = useState(null);
 const emailChange = (e) => setEmail(e.target.value);
 const passwordChange = (e) => setPassword(e.target.value);
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   if (email.trim() === "") {
     alert('There is no email on set. Please enter an email.');
@@ -32,6 +34,25 @@ const handleSubmit = (e) => {
     alert('There is no password on set. Please enter a password.');
     setPasswordColor('#DC2626');
     setPasswordBackground('#FEE2E2');
+  }
+  const {data, error} = await supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+  if (error) {
+    alert('Sign up unsuccessful. Please try again.');
+    setEmail("");
+    setPassword("");
+  }
+
+  if (!error) {
+    const user = data.user
+    await supabase.from('signup').insert({
+      user_id: user.id,
+      email: email,
+    })
+  alert('Your form was submitted successfully!');
+  navigate('/')
   }
 }
   return (
